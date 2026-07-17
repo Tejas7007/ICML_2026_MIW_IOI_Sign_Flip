@@ -1,0 +1,44 @@
+{
+  "description": "Split-safe frozen suppressor-set trajectory (retrained Pythia-160M, seed 42). Fair three-way margin effect of replacing a mature-defined suppressor set, evaluated on a held-out item split. Component (head) identities are intentionally omitted; see paper Section 6 and Appendix D.",
+  "metric": "d_margin3_mean (fair three-way margin, matched replacement of the frozen set)",
+  "condition": "mature_suppressors_full_z",
+  "n_items_per_checkpoint": 192,
+  "n_observations_per_checkpoint": 384,
+  "by_step": {
+    "step_1800": {
+      "d_margin3_mean": 0.0933,
+      "d_margin3_ci": [
+        0.0618,
+        0.1252
+      ]
+    },
+    "step_2000": {
+      "d_margin3_mean": 0.0914,
+      "d_margin3_ci": [
+        0.0622,
+        0.1206
+      ]
+    },
+    "step_3200": {
+      "d_margin3_mean": -0.0515,
+      "d_margin3_ci": [
+        -0.1148,
+        0.0138
+      ]
+    },
+    "step_5000": {
+      "d_margin3_mean": -0.0794,
+      "d_margin3_ci": [
+        -0.1631,
+        0.0058
+      ]
+    },
+    "step_6000": {
+      "d_margin3_mean": -0.6359,
+      "d_margin3_ci": [
+        -0.8017,
+        -0.4679
+      ]
+    }
+  }
+}

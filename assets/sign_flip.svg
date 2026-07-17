@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 360" font-family="ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial" role="img" aria-label="Animated diagram of the training-time sign flip in IOI">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+    <linearGradient id="acc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/><stop offset="1" stop-color="#79c0ff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="820" height="360" rx="10" fill="url(#bg)"/>
+  <text x="40" y="46" fill="#e6edf3" font-size="20" font-weight="700">A training-time sign flip in IOI circuit formation</text>
+  <text x="40" y="70" fill="#8b949e" font-size="13">The model's dependence on the repeated-name state reverses during training.</text>
+
+  <!-- plot area: x 90..690, y 100..270 -->
+  <g>
+    <!-- window band (drawn first, behind) -->
+    <rect x="250" y="100" width="70" height="170" fill="#f2cc60" opacity="0">
+      <animate attributeName="opacity" from="0" to="0.07" begin="1.4s" dur="0.6s" fill="freeze"/>
+    </rect>
+
+    <!-- chance line -->
+    <line x1="90" y1="150" x2="690" y2="150" stroke="#30363d" stroke-width="1" stroke-dasharray="5 4"/>
+    <text x="696" y="154" fill="#6e7681" font-size="11">chance</text>
+
+    <!-- zero line for the intervention row -->
+    <line x1="90" y1="235" x2="690" y2="235" stroke="#21262d" stroke-width="1"/>
+
+    <!-- IOI accuracy: rise, dip below chance in the window, recover -->
+    <path d="M90,160 C150,120 210,118 280,196 C320,240 360,240 420,150 C500,96 610,90 690,88"
+          fill="none" stroke="url(#acc)" stroke-width="3" stroke-linecap="round"
+          stroke-dasharray="1200" stroke-dashoffset="1200">
+      <animate attributeName="stroke-dashoffset" from="1200" to="0" dur="2.6s" fill="freeze"/>
+    </path>
+    <text x="96" y="112" fill="#79c0ff" font-size="12" font-weight="600" opacity="0">IOI accuracy
+      <animate attributeName="opacity" from="0" to="1" begin="1.0s" dur="0.8s" fill="freeze"/>
+    </text>
+    <text x="285" y="92" fill="#8b949e" font-size="11" text-anchor="middle" opacity="0">below-chance window
+      <animate attributeName="opacity" from="0" to="1" begin="1.6s" dur="0.6s" fill="freeze"/>
+    </text>
+
+    <!-- intervention markers: helps (+) at the floor, harms (-) at maturity -->
+    <g opacity="0">
+      <animate attributeName="opacity" from="0" to="1" begin="2.2s" dur="0.6s" fill="freeze"/>
+      <!-- floor marker -->
+      <circle cx="300" cy="205" r="9" fill="#3fb950"/>
+      <text x="300" y="210" fill="#0d1117" font-size="13" font-weight="800" text-anchor="middle">+</text>
+      <text x="300" y="292" fill="#3fb950" font-size="13" text-anchor="middle" font-weight="700">+0.95</text>
+      <text x="300" y="310" fill="#8b949e" font-size="11" text-anchor="middle">intervention helps</text>
+      <!-- maturity marker -->
+      <circle cx="640" cy="262" r="9" fill="#f85149"/>
+      <text x="640" y="267" fill="#0d1117" font-size="14" font-weight="800" text-anchor="middle">-</text>
+      <text x="640" y="292" fill="#f85149" font-size="13" text-anchor="middle" font-weight="700">-4.12</text>
+      <text x="640" y="310" fill="#8b949e" font-size="11" text-anchor="middle">intervention harms</text>
+      <!-- connector -->
+      <path d="M312,207 C430,207 540,262 628,262" fill="none" stroke="#6e7681" stroke-width="1.5" stroke-dasharray="4 4"/>
+    </g>
+
+    <!-- x-axis labels -->
+    <text x="90" y="330" fill="#6e7681" font-size="11">init</text>
+    <text x="662" y="330" fill="#6e7681" font-size="11">mature</text>
+    <text x="352" y="330" fill="#484f58" font-size="11" text-anchor="middle">training step  (log scale)</text>
+  </g>
+</svg>
