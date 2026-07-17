@@ -1,0 +1,11 @@
+{
+  "description": "Window-localization summary reported in Section 6 of the camera-ready paper.",
+  "model": "Pythia-160M",
+  "step": 2000,
+  "intervention": "zero-ablate one attention head while all other heads run normally",
+  "n_heads": 144,
+  "reported_max_change_in_logit_difference": 0.06,
+  "provenance_status": "aggregate-only paper summary",
+  "warning": "The exact per-head raw artifact corresponding to this reported aggregate was not present in the final camera-ready source bundle. This file is not raw evidence and the release audit reports it as an explicit provenance limitation.",
+  "recommended_resolution": "Before archival publication, source-lock the exact per-head result artifact or remove the numerical 0.06 sentence from the manuscript."
+}

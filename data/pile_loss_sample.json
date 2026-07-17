@@ -1,0 +1,30 @@
+{
+  "description": "Language-modeling loss on a fixed evaluation sample drawn from the monology/pile-uncopyrighted training stream.",
+  "dataset": {"id":"monology/pile-uncopyrighted","split":"train","streaming":true},
+  "procedure": {
+    "skip_records": 100000,
+    "candidate_texts_read": 100,
+    "minimum_tokens": 512,
+    "tokens_per_sequence": 512,
+    "maximum_sequences": 50,
+    "aggregation": "mean causal language-model loss across qualifying sequences",
+    "sample_identity_recoverable": false,
+    "limitation": "The producing script did not save text identifiers, text hashes, token hashes, or the observed qualifying-sequence count."
+  },
+  "by_step": {
+    "step_1000":{"released_pythia_160m_loss":3.7342,"retrained_seed42_loss":3.4475},
+    "step_2000":{"released_pythia_160m_loss":3.1397,"retrained_seed42_loss":3.149},
+    "step_3000":{"released_pythia_160m_loss":2.9638,"retrained_seed42_loss":3.007},
+    "step_5000":{"released_pythia_160m_loss":2.8006,"retrained_seed42_loss":2.8564},
+    "step_10000":{"released_pythia_160m_loss":2.6766,"retrained_seed42_loss":2.7228}
+  },
+  "paper_series":"released_pythia_160m_loss",
+  "source": {
+    "repository": "Tejas7007/ICML_2026_MIW_IOI_Sign_Flip",
+    "ref": "f0cab441749a0e577ee954c48cbeb00a2b156015",
+    "path": "data/loss_and_head_sweep.json",
+    "blob_sha": "25c4f8cccee2f02ee561634e9b7654ac35e34526",
+    "json_path": "exp_c_loss_comparison",
+    "release_transformation": "extracted the loss-comparison block from a broad historical bundle"
+  }
+}

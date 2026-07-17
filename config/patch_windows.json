@@ -1,19 +1,49 @@
 {
-  "description": "Residual-stream patch windows for the matched-S2 intervention, per model. The window is the set of transformer layers at whose `hook_resid_post` the S2 state is replaced with the matched control's state. Windows are middle-layer bands scaled to each model's depth, defined in the producing analysis scripts and reproduced in the paper (Section 3 and Appendix E).",
-  "metric": "logit difference between the correct (indirect-object) name and the repeated (subject) name at the final position",
+  "description": "Residual-stream patch windows for the matched-S2 intervention. Each layer index refers to blocks.{layer}.hook_resid_post.",
+  "metric": "change in logit(IO) - logit(S) at the final token position",
+  "protocol": "first ten historical BABA-style IOI template families, 30 prompts per template, symmetric name-role swaps, seed 42",
   "windows": {
-    "pythia-160m": {"layers": [3, 4, 5],                         "n_layers_total": 12},
-    "pythia-410m": {"layers": [6, 7, 8, 9, 10],                  "n_layers_total": 24},
-    "pythia-1b":   {"layers": [4, 5, 6, 7, 8],                   "n_layers_total": 16},
-    "pythia-2.8b": {"layers": [8, 9, 10, 11, 12, 13, 14],        "n_layers_total": 32},
-    "pythia-6.9b": {"layers": [8, 9, 10, 11, 12, 13, 14],        "n_layers_total": 32},
-    "pythia-12b":  {"layers": [9, 10, 11, 12, 13, 14, 15, 16],   "n_layers_total": 36}
+    "pythia-160m": {
+      "layers": [3,4,5],
+      "n_layers_total": 12,
+      "model_id": "EleutherAI/pythia-160m-deduped"
+    },
+    "pythia-410m": {
+      "layers": [6,7,8,9,10],
+      "n_layers_total": 24,
+      "model_id": "EleutherAI/pythia-410m-deduped"
+    },
+    "pythia-1b": {
+      "layers": [4,5,6,7,8],
+      "n_layers_total": 16,
+      "model_id": "EleutherAI/pythia-1b-deduped"
+    },
+    "pythia-2.8b": {
+      "layers": [8,9,10,11,12,13,14],
+      "n_layers_total": 32,
+      "model_id": "EleutherAI/pythia-2.8b-deduped"
+    },
+    "pythia-6.9b": {
+      "layers": [8,9,10,11,12,13,14],
+      "n_layers_total": 32,
+      "model_id": "EleutherAI/pythia-6.9b-deduped"
+    },
+    "pythia-12b": {
+      "layers": [9,10,11,12,13,14,15,16],
+      "n_layers_total": 36,
+      "model_id": "EleutherAI/pythia-12b-deduped"
+    }
   },
   "provenance": {
-    "note": "Windows are encoded in the analysis scripts that produced the released result files. The commit hashes below identify the internal analysis repositories; the released numbers are committed under data/ and checked by scripts/verify_claims.py.",
-    "source_commits": {
-      "signflip_160m_410m_1b": "036c02f8699b",
-      "signflip_2.8b_6.9b_12b_and_locked_controls": "9fdc7e8c0c08"
-    }
+    "small_scale_result": {
+      "path": "data/signflip_across_scale_160m_410m_1b.json",
+      "source_blob_sha": "e659ab6dc04f8c1b18b8c1471b6d57ac1e74bac3"
+    },
+    "small_scale_producer": {
+      "repository": "Tejas7007/detection-before-suppression",
+      "path": "scripts/emnlp_consistent_signflip.py",
+      "source_blob_sha": "e7cb948003fa0e8d1e99b9a85048e49924baa11e"
+    },
+    "large_scale_note": "Large-scale windows were audited against the historical producing scripts before release; the released result artifacts are canonical for the reported values."
   }
 }

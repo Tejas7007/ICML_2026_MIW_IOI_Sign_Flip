@@ -6,72 +6,38 @@
 
 Mechanistic Interpretability Workshop at ICML 2026
 
-[![Paper](https://img.shields.io/badge/paper-PDF-b31b1b.svg)](paper/sign_flip_ioi_miw2026.pdf)
-[![Checkpoint](https://img.shields.io/badge/%F0%9F%A4%97%20checkpoint-pythia--160m--seed42--dense-yellow.svg)](https://huggingface.co/teys7007/pythia-160m-seed42-dense)
-[![Data](https://img.shields.io/badge/data-15%20result%20files-0969da.svg)](data/)
+[![Paper](https://img.shields.io/badge/paper-camera--ready_PDF-b31b1b.svg)](paper/sign_flip_ioi_miw2026.pdf)
+[![Checkpoint](https://img.shields.io/badge/%F0%9F%A4%97%20checkpoint-retrained_Pythia--160M-yellow.svg)](https://huggingface.co/anonymous-research-sub/pythia-160m-retrained-seed42)
+[![Verification](https://img.shields.io/github/actions/workflow/status/Tejas7007/ICML_2026_MIW_IOI_Sign_Flip/verify.yml?branch=main&label=artifact%20verification)](https://github.com/Tejas7007/ICML_2026_MIW_IOI_Sign_Flip/actions/workflows/verify.yml)
 [![License](https://img.shields.io/badge/license-MIT%20%2B%20CC--BY--4.0-3fb950.svg)](LICENSE)
 
 </div>
 
 ---
 
-## Overview
+## Release-audit status
 
-Circuit analyses usually describe a trained model at a single checkpoint, yet the
-role a component plays can differ earlier in training. We show a case where it
-reverses. An internal state that is harmful to a behavior early in training
-becomes useful for it later.
+This branch is a hardened camera-ready evidence package, but it is intentionally **not marked final** while the source audit items in [`docs/RELEASE_AUDIT.md`](docs/RELEASE_AUDIT.md) remain open. The numerical artifacts are preserved rather than silently altered to make an unresolved paper sentence pass verification.
 
-We study indirect object identification (IOI). The task is to complete a sentence
-such as *"When Mary and John went to the store, John gave a drink to ___"* with the
-name that occurred once (Mary) rather than the repeated name (John). During
-training, accuracy on this two-way choice falls below chance in a transient
-window and then recovers, while the language-modeling loss keeps decreasing.
-Replacing the internal state at the repeated name's second occurrence (S2) with a
-matched non-repeating one helps the choice during the window and harms it after
-recovery. The model's dependence on that state has flipped sign.
+## What this repository establishes
 
-## The central result
+A language model can depend on the same position-level internal state in opposite ways at different stages of training.
 
-Three properties are usually assumed to appear together during training: whether
-a signal is readable, whether a position is causally used, and whether a working
-component has formed. In IOI they resolve at different training steps.
+We study indirect object identification (IOI). In a prompt such as
+
+> When Mary and John went to the store, John gave a drink to ___
+
+the correct continuation is **Mary**, the name that appears once, rather than **John**, the repeated name. During early training, the model passes through a transient window in which its two-way IO-versus-repeated-name accuracy falls below 50 percent. At the Pythia-160M floor, replacing the internal state at the repeated name's second occurrence, **S2**, with a matched non-repeating control improves the logit difference by **+0.95**. At the final checkpoint, the same intervention family changes it by **-4.12**.
+
+The positive-to-negative reversal replicates across all six tested Pythia scales, all nine PolyPythias training variants, and Stanford GPT-2 Small. The paper separately tracks linear accessibility, position-level causal dependence, and suppressor function. These measurements follow different training trajectories and should not be treated as one event.
 
 <div align="center">
-<img src="assets/three_timelines.svg" alt="The three properties resolve at different training steps" width="820"/>
+<img src="assets/three_timelines.svg" alt="Accessibility, causal dependence, and suppressor function follow different training trajectories" width="820"/>
 </div>
 
-The repeated-name signal becomes linearly readable by a probe on one timeline. The
-causal role of the S2 state flips from positive to negative on a second timeline. A
-suppressor head that writes against the repeated name reaches a detectable causal
-effect on a third, later timeline. A description that is faithful at maturity can
-therefore be wrong about an earlier checkpoint.
+## Headline evidence
 
-## Three findings
-
-1. **A below-chance window.** IOI accuracy dips below the 50 percent two-way
-   baseline and recovers, across six model scales, nine PolyPythias training
-   variants, and a second model family.
-2. **The causal role of S2 reverses.** The matched-S2 intervention is significantly
-   positive at the floor and significantly negative at maturity. This
-   positive-to-negative reversal replicates across all six Pythia scales, all nine
-   PolyPythias variants, and Stanford GPT-2 Small.
-3. **Three properties on three timelines.** The suppressor head develops its causal
-   effect during recovery, after the harmful S2 dependence is already present, and
-   the direction a probe uses to read the repeated name is not the direction whose
-   removal changes behavior.
-
-## The reversal replicates at every scale
-
-<div align="center">
-<img src="assets/scale_replication.svg" alt="The sign flip replicates across six model scales" width="820"/>
-</div>
-
-Matched-S2 intervention effect at the floor and at maturity. A positive value moves
-the model toward the correct name; a negative value moves it toward the repeated
-name.
-
-| Model | Floor accuracy | Window effect | Maturity effect | Patch window |
+| Model | Floor accuracy | Intervention at floor | Intervention at maturity | Residual patch window |
 |:--|--:|--:|--:|:--|
 | Pythia-160M | 31.7% | +0.95 | -4.12 | layers 3 to 5 |
 | Pythia-410M | 29.3% | +0.11 | -3.63 | layers 6 to 10 |
@@ -80,102 +46,110 @@ name.
 | Pythia-6.9B | 32.3% | +0.84 | -4.12 | layers 8 to 14 |
 | Pythia-12B | 42.0% | +0.43 | -3.96 | layers 9 to 16 |
 
-All nine PolyPythias training variants reverse sign. These vary the random seed,
-the data order, and the initialization, with floors from 14.7 percent to 36.7
-percent, window effects up to +1.47, and maturity effects down to -4.75. Stanford
-GPT-2 Small moves from +1.03 at step 1,500 to -2.89 at step 100,000.
-
-Every number, with its data file and exact field path, is listed in
-[`MANIFEST.md`](MANIFEST.md).
-
-## Figures from the paper
+For the primary 160M result, the sign survives dependence-aware resampling. The template-clustered interval is **[+0.68, +1.25]** at the floor and **[-4.54, -3.72]** at maturity. The non-160M scale results are released as prompt-level estimates; the paper does not claim that a cluster-aware interval excludes zero for the small 410M floor effect.
 
 <div align="center">
-<img src="figures/fig2_sign_flip.png" alt="Figure 2" width="94%"/>
-<br>
-<sub><b>Figure 2.</b> Three measurements on Pythia-160M across training: IOI accuracy, the matched-S2 intervention with a bootstrap band, and suppressor mean-ablation. The intervention helps at the floor and harms at maturity, and the suppressor develops its effect during recovery.</sub>
+<img src="assets/scale_replication.svg" alt="Matched-S2 intervention effects at the floor and at maturity across six Pythia scales" width="820"/>
 </div>
 
-<br>
+## Paper figures
+
+<div align="center">
+<img src="figures/fig2_sign_flip.png" alt="Accuracy, matched-S2 intervention, and suppressor mean-ablation across Pythia-160M training" width="94%"/>
+</div>
 
 <table>
 <tr>
-<td width="50%" valign="top" align="center">
-<img src="figures/fig1_below_chance_dip.png" alt="Figure 1" width="86%"/>
-<br><sub><b>Figure 1.</b> The below-chance window across six model scales.</sub>
-</td>
-<td width="50%" valign="top" align="center">
-<img src="figures/fig3_loss_vs_accuracy.png" alt="Figure 3" width="66%"/>
-<br><sub><b>Figure 3.</b> Pile evaluation-sample loss and IOI accuracy.</sub>
-</td>
+<td width="50%" valign="top" align="center"><img src="figures/fig1_below_chance_dip.png" alt="Below-chance IOI window across six Pythia scales" width="86%"/></td>
+<td width="50%" valign="top" align="center"><img src="figures/fig3_loss_vs_accuracy.png" alt="Pile evaluation-sample loss and IOI accuracy across sampled checkpoints" width="66%"/></td>
 </tr>
 </table>
 
-These are the figures printed in the paper. Run `python scripts/make_figures.py`
-to regenerate them from the released data files.
+The figures are generated only from the committed JSON artifacts. No model download is required to verify the source-locked numbers or redraw the plots.
 
-## Reproduce it
+## Three reproducibility levels
+
+### 1. Verify every source-locked value
 
 ```bash
-git clone https://github.com/Tejas7007/ICML_2026_MIW_IOI_Sign_Flip.git
-cd ICML_2026_MIW_IOI_Sign_Flip
-pip install -r requirements.txt
-
-# Check every reported number against the released data files
 python scripts/verify_claims.py --verbose
+```
 
-# Redraw the three paper figures from the same files
+The verifier checks the released numerical evidence for Tables 1 through 11, main-text quantities, patch-window configuration, result schemas, and figure inputs. The release audit separately blocks publication when a paper-facing claim is not source-locked or does not match its canonical artifact.
+
+### 2. Regenerate the paper figures
+
+```bash
 python scripts/make_figures.py
 ```
 
-To recompute the core measurement from the model itself, which requires `torch`
-and `transformer_lens`:
+This writes both PDF and PNG versions of Figures 1 through 3 from the committed artifacts.
+
+### 3. Re-run the central residual-stream intervention
+
+This requires a CUDA-capable environment and downloads public Pythia checkpoints.
 
 ```bash
-python scripts/reproduce_intervention.py --model pythia-160m --step 2000     # window: helps
-python scripts/reproduce_intervention.py --model pythia-160m --step 143000   # mature: harms
+pip install -r requirements.txt
+python scripts/reproduce_intervention.py \
+  --model pythia-160m \
+  --step 2000 \
+  --output results/reproduced_pythia-160m_step2000.json
 ```
 
-The retrained Pythia-160M checkpoint (seed 42) used for the split-safe analyses is
-on the Hugging Face Hub at
-[`teys7007/pythia-160m-seed42-dense`](https://huggingface.co/teys7007/pythia-160m-seed42-dense).
-All other checkpoints are the public [Pythia](https://huggingface.co/EleutherAI)
-suite and [Stanford GPT-2](https://huggingface.co/stanford-crfm).
+The reference runner implements the exact historical ten-template, 300-prompt protocol used for the core cross-scale result. The producer uses the first ten BABA-style IOI template families with symmetric name-role swaps; it is not a five-ABBA/five-BABA design. It uses released deduplicated Pythia checkpoints, checkpoint-local matched controls, the model-specific patch window from `config/patch_windows.json`, 10,000 bootstrap draws, and no hard-coded authentication token.
 
-## Repository layout
+The independently trained model used in the split-safe analyses is available at [`anonymous-research-sub/pythia-160m-retrained-seed42`](https://huggingface.co/anonymous-research-sub/pythia-160m-retrained-seed42).
 
-```
+## Repository map
+
+```text
 .
-|-- paper/          Camera-ready PDF
-|-- figures/        The three figures, exactly as they appear in the paper
-|-- data/           One result file per table and figure (see MANIFEST.md)
-|-- scripts/
-|   |-- verify_claims.py            Checks every reported number against data/
-|   |-- make_figures.py             Redraws Figures 1 to 3 from data/
-|   |-- reproduce_intervention.py   Reference implementation of the S2 intervention
+|-- paper/
+|   `-- sign_flip_ioi_miw2026.pdf
+|-- figures/
+|   |-- fig1_below_chance_dip.{pdf,png}
+|   |-- fig2_sign_flip.{pdf,png}
+|   `-- fig3_loss_vs_accuracy.{pdf,png}
+|-- data/
+|   `-- paper-facing result artifacts
 |-- config/
-|   |-- patch_windows.json          Per-model patch windows and provenance
-|-- assets/         Animated figures used in this README
-|-- MANIFEST.md     Claim to data file to field path, for every table and figure
+|   `-- patch_windows.json
+|-- scripts/
+|   |-- verify_claims.py
+|   |-- make_figures.py
+|   |-- reproduce_intervention.py
+|   |-- audit_release.py
+|   `-- lib/ioi_dataset.py
+|-- docs/
+|   |-- REPRODUCIBILITY.md
+|   |-- SOURCE_PROVENANCE.md
+|   |-- PRODUCER_INDEX.md
+|   `-- RELEASE_AUDIT.md
+|-- MANIFEST.md
+|-- release_status.json
+|-- CITATION.cff
+`-- LICENSE
 ```
 
-## What the data files contain
+## Evidence policy
 
-Each file in [`data/`](data/) is the result artifact behind one part of the paper:
-the sign flip across scale, the nine PolyPythias variants, Stanford GPT-2, the
-position control battery, the locked 800-prompt input control (with a frozen prompt
-hash and cluster-aware intervals), the held-out and position-shuffle probes, the
-suppressor mean-ablation trajectory, the split-safe frozen suppressor-set
-trajectory, projection removal, the full-vocabulary floor behavior, and the Pile
-evaluation-sample loss.
+This repository is a camera-ready evidence package, not a dump of every exploratory experiment performed during the project.
 
-Two quantities are reported as point estimates or as non-reconstructable by design.
-The Pythia-410M window effect is a cross-scale point estimate, so no cluster-aware
-interval is claimed for it. The Pile evaluation-sample loss is computed on a fixed
-sample of the Pile training stream, and the analysis script records the procedure
-and the aggregate losses but not the sampled-text identities. Both points are
-documented in [`MANIFEST.md`](MANIFEST.md) and in the paper. Component identities
-for the suppressor set are intentionally omitted from the released split-safe file.
+- Each source-locked paper claim maps to one canonical released artifact in [`MANIFEST.md`](MANIFEST.md); unresolved claims are listed explicitly rather than forced to pass.
+- Exact copies and compact derivatives are distinguished in [`docs/SOURCE_PROVENANCE.md`](docs/SOURCE_PROVENANCE.md), and original producer scripts are indexed in [`docs/PRODUCER_INDEX.md`](docs/PRODUCER_INDEX.md).
+- Historical files that used different prompt protocols are excluded rather than presented as independent replications.
+- Later mechanism experiments about copying heads, MLP localization, equality tests, routing, and final-logit closure are outside this workshop paper's scope.
+- The fixed Pile training-stream sample cannot be reconstructed exactly because sampled text identities were not stored. The procedure and aggregate values are released, and the paper states this limitation.
+- The 410M floor intervention is retained as a cross-scale point estimate. No dependence-aware interval is claimed for that cell.
+
+## Automated release audit
+
+```bash
+python scripts/audit_release.py
+```
+
+The audit checks credential-like strings, hard-coded tokens, absolute workstation paths, stale model identifiers, malformed JSON, missing artifacts, superseded files, final PDF metadata, and unresolved release blockers. The same checks run in GitHub Actions.
 
 ## Citation
 
@@ -184,13 +158,11 @@ for the suppressor set are intentionally omitted from the released split-safe fi
   title     = {A Training-Time Sign Flip in {IOI} Circuit Formation},
   author    = {Dahiya, Tejas and Blondin, Cole},
   booktitle = {Mechanistic Interpretability Workshop at the
-               43rd International Conference on Machine Learning (ICML)},
+               43rd International Conference on Machine Learning},
   year      = {2026}
 }
 ```
 
 ## License
 
-Code in `scripts/` and `config/` is released under the MIT License. Data, figures,
-and text are released under CC-BY-4.0. The analyzed models are released by their
-respective authors under their own licenses.
+Code and configuration are released under the MIT License. Released data, figures, and documentation are provided under CC BY 4.0. Model checkpoints remain under the licenses selected by their respective publishers.

@@ -1,0 +1,13 @@
+{
+  "title": "A Training-Time Sign Flip in IOI Circuit Formation",
+  "camera_ready_file": "paper/sign_flip_ioi_miw2026.pdf",
+  "repository_url": "https://github.com/Tejas7007/ICML_2026_MIW_IOI_Sign_Flip",
+  "checkpoint_url": "https://huggingface.co/anonymous-research-sub/pythia-160m-retrained-seed42",
+  "status": "pending corrected camera-ready PDF",
+  "expected_pages": 12,
+  "required_pdf_properties": [
+    "matches corrected manuscript",
+    "contains clickable repository URI",
+    "hash recorded after final export"
+  ]
+}

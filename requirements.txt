@@ -1,8 +1,5 @@
-# Verification and figures (scripts/verify_claims.py, scripts/make_figures.py)
-matplotlib>=3.6
-
-# Reference implementation only (scripts/reproduce_intervention.py); requires a GPU
-# and downloads public checkpoints. Not needed to verify the released numbers.
-torch>=2.0
-transformer-lens>=1.14
-numpy>=1.23
+numpy>=1.24,<3
+matplotlib>=3.7,<4
+torch>=2.1
+transformers>=4.38
+transformer-lens>=2.0

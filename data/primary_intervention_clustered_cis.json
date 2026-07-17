@@ -1,0 +1,19 @@
+{
+  "description": "Dependence-aware uncertainty for the primary Pythia-160M matched-S2 residual patch over layers 3 to 5.",
+  "primary_window": [3,4,5],
+  "clustered_ci": {
+    "dip": {
+      "step":2000,"mean_dld":0.9525947872797648,"n":300,
+      "ci_prompt":[0.8575870744387308,1.0503840417861938],
+      "ci_template_clustered":[0.6766397485733032,1.2491977947155635],
+      "ci_namepair_clustered":[0.7787146024306615,1.1500294443766277]
+    },
+    "mature": {
+      "step":143000,"mean_dld":-4.122474937438965,"n":300,
+      "ci_prompt":[-4.283592185338338,-3.9623192332585653],
+      "ci_template_clustered":[-4.542369227091471,-3.7168933520317076],
+      "ci_namepair_clustered":[-4.4511339907646175,-3.815812238375346]
+    }
+  },
+  "source": {"repository":"Tejas7007/detection-before-suppression","path":"results/emnlp_robustness_cis_layers.json","blob_sha":"6af4ae987c96f0bf1b8030e70336717881aa7dbf"}
+}

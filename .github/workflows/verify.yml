@@ -1,0 +1,56 @@
+name: Verify camera-ready release
+
+on:
+  push:
+    branches: [main, audit/release-hardening]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install verification dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-lock.txt
+
+      - name: Compile release scripts
+        run: python -m compileall -q scripts
+
+      - name: Verify reported values
+        run: python scripts/verify_claims.py --verbose
+
+      - name: Audit release hygiene and readiness
+        run: python scripts/audit_release.py --allow-blocked
+
+      - name: Regenerate Figure 1
+        run: |
+          rm -rf /tmp/paper_figures
+          python scripts/make_figures.py --figure 1 --output-dir /tmp/paper_figures
+          test -s /tmp/paper_figures/fig1_below_chance_dip.pdf
+          test -s /tmp/paper_figures/fig1_below_chance_dip.png
+
+      - name: Regenerate Figure 2
+        run: |
+          python scripts/make_figures.py --figure 2 --output-dir /tmp/paper_figures
+          test -s /tmp/paper_figures/fig2_sign_flip.pdf
+          test -s /tmp/paper_figures/fig2_sign_flip.png
+
+      - name: Regenerate Figure 3
+        run: |
+          python scripts/make_figures.py --figure 3 --output-dir /tmp/paper_figures
+          test -s /tmp/paper_figures/fig3_loss_vs_accuracy.pdf
+          test -s /tmp/paper_figures/fig3_loss_vs_accuracy.png

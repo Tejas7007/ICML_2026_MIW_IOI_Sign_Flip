@@ -1,0 +1,26 @@
+{
+  "status": "blocked",
+  "audit_date": "2026-07-17",
+  "blockers": [
+    {
+      "id": "protocol-template-order",
+      "description": "Paper says balanced ABBA/BABA; audited producer uses first ten BABA-style families with symmetric name-role swaps."
+    },
+    {
+      "id": "polypythia-table9-protocol-mix",
+      "description": "Several Table 9 floor accuracies come from a distinct 15-template behavioral sweep rather than the ten-template causal file."
+    },
+    {
+      "id": "heldout-probe-producer",
+      "description": "The exact raw result artifact is source-locked, but its generating script has not yet been located."
+    },
+    {
+      "id": "dip-head-localization-source",
+      "description": "Exact per-head artifact for the reported 0.06 maximum is not source-locked."
+    },
+    {
+      "id": "final-pdf-public-release",
+      "description": "Final corrected PDF, clickable repository link, and public repository visibility remain pending."
+    }
+  ]
+}

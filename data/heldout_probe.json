@@ -1,0 +1,37 @@
+{
+  "description": "Paper-facing held-out probe results only. Unrelated phases from the historical combined artifact are intentionally excluded.",
+  "model": {
+    "public_release": "anonymous-research-sub/pythia-160m-retrained-seed42"
+  },
+  "task": {
+    "positive_class": "S2 representation in the original repeated-name prompt",
+    "negative_class": "the same position in a matched control with a fresh non-repeating name",
+    "n_train_per_fold": 600,
+    "folds": 2,
+    "split": "disjoint names and templates; folds swap the two partitions",
+    "layer_selection": "reported per layer; no best-layer selection on evaluation data"
+  },
+  "by_step": {
+    "step_0": {
+      "layer_1": {"trained_on_A":0.43666666666666665,"trained_on_B":0.435,"mean":0.4358333333333333},
+      "layer_5": {"trained_on_A":0.44166666666666665,"trained_on_B":0.445,"mean":0.44333333333333336}
+    },
+    "step_2000": {
+      "layer_1": {"trained_on_A":0.6633333333333333,"trained_on_B":0.5616666666666666,"mean":0.6125},
+      "layer_5": {"trained_on_A":0.525,"trained_on_B":0.7066666666666667,"mean":0.6158333333333333}
+    },
+    "step_143000": {
+      "layer_1": {"trained_on_A":0.9883333333333333,"trained_on_B":0.995,"mean":0.9916666666666667},
+      "layer_5": {"trained_on_A":0.99,"trained_on_B":0.9983333333333333,"mean":0.9941666666666666}
+    }
+  },
+  "source": {
+    "repository": "Tejas7007/ICML_2026_MIW_IOI_Sign_Flip",
+    "ref": "f0cab441749a0e577ee954c48cbeb00a2b156015",
+    "path": "data/heldout_probe_and_position.json",
+    "blob_sha": "aec79770a7e22bc592994610f82c3db0256af7a1",
+    "json_path": "phase1_heldout_probes",
+    "release_transformation": "retained the held-out probe phase and removed unrelated position and trajectory phases",
+    "producer_status": "the exact generating script is not yet source-locked"
+  }
+}
