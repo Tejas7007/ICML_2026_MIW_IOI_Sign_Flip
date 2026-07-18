@@ -1,0 +1,17 @@
+{
+  "description": "Disjoint single-head suppressor confirmation on the independently trained Pythia-160M model.",
+  "model": "teys7007/pythia-160m-seed42-dense",
+  "selection": "one mature-selected suppressor head identified on a separate selection split",
+  "evaluation": {
+    "step": 2000,
+    "n_examples": 800,
+    "split": "disjoint test examples",
+    "cluster_aware": true
+  },
+  "effect": {
+    "metric": "change in IOI logit difference under the recorded head intervention",
+    "mean": 0.038,
+    "ci95": [-0.024, 0.114]
+  },
+  "interpretation": "The interval includes zero, so this analysis does not detect a suppressive effect at the window checkpoint."
+}

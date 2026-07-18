@@ -1,0 +1,60 @@
+{
+  "pythia-160m": {
+    "model": "EleutherAI/pythia-160m-deduped",
+    "head": "L8H9",
+    "n_examples": 200,
+    "by_step": {
+      "step_1000": {
+        "attention_to_IO": 0.0397,
+        "attention_to_S1": 0.0785,
+        "attention_to_S2": 0.0226,
+        "mean_IO_projection": -0.0127,
+        "mean_S_projection": -0.0147,
+        "IO_minus_S_projection": 0.002
+      },
+      "step_3000": {
+        "attention_to_IO": 0.0329,
+        "attention_to_S1": 0.0532,
+        "attention_to_S2": 0.8685,
+        "mean_IO_projection": -0.4189,
+        "mean_S_projection": -1.4049,
+        "IO_minus_S_projection": 0.9859
+      },
+      "step_143000": {
+        "attention_to_IO": 0.0294,
+        "attention_to_S1": 0.0306,
+        "attention_to_S2": 0.9216,
+        "mean_IO_projection": -0.577,
+        "mean_S_projection": -6.2461,
+        "IO_minus_S_projection": 5.6691
+      }
+    },
+    "protocol": {
+      "template_selection": "ALL_TEMPLATES[:10]",
+      "template_order": "the first ten BABA-style template families",
+      "template_families": 10,
+      "prompts_per_template": 20,
+      "symmetric_name_role_swaps": true,
+      "seed": 42,
+      "n_examples": 200,
+      "attention_source": "final prediction position",
+      "projection_metric": "head output projected onto IO and repeated-name unembedding directions"
+    }
+  },
+  "stanford-gpt2-small": {
+    "model": "stanford-crfm/alias-gpt2-small-x21",
+    "checkpoint": 100000,
+    "head": "L10H10",
+    "zero_ablation_accuracy_change": -0.09,
+    "attention_to_IO": 0.0555,
+    "attention_to_S1": 0.0519,
+    "attention_to_S2": 0.589,
+    "mean_IO_projection": -0.0389,
+    "mean_S_projection": -6.2787,
+    "IO_minus_S_projection": 6.2399,
+    "measurement": {
+      "attention_source": "final prediction position",
+      "projection_metric": "head output projected onto IO and repeated-name unembedding directions"
+    }
+  }
+}

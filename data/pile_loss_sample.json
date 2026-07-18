@@ -1,0 +1,24 @@
+{
+  "description": "Language-modeling loss on a fixed evaluation sample drawn from the monology/pile-uncopyrighted training stream.",
+  "dataset": {
+    "id": "monology/pile-uncopyrighted",
+    "split": "train",
+    "streaming": true
+  },
+  "procedure": {
+    "skip_records": 100000,
+    "candidate_texts_read": 100,
+    "minimum_tokens": 512,
+    "tokens_per_sequence": 512,
+    "maximum_sequences": 50,
+    "aggregation": "mean causal language-model loss across qualifying sequences"
+  },
+  "by_step": {
+    "step_1000": {"released_pythia_160m_loss": 3.7342, "retrained_seed42_loss": 3.4475},
+    "step_2000": {"released_pythia_160m_loss": 3.1397, "retrained_seed42_loss": 3.149},
+    "step_3000": {"released_pythia_160m_loss": 2.9638, "retrained_seed42_loss": 3.007},
+    "step_5000": {"released_pythia_160m_loss": 2.8006, "retrained_seed42_loss": 2.8564},
+    "step_10000": {"released_pythia_160m_loss": 2.6766, "retrained_seed42_loss": 2.7228}
+  },
+  "paper_series": "released_pythia_160m_loss"
+}

@@ -1,0 +1,37 @@
+{
+  "description": "Residual-stream patch windows for the matched-S2 intervention. Layer indices refer to blocks.{layer}.hook_resid_post.",
+  "metric": "change in logit(IO) - logit(S) at the final token position",
+  "protocol": "ten BABA-style IOI template families, 30 prompts per template, symmetric name-role swaps, seed 42",
+  "windows": {
+    "pythia-160m": {
+      "layers": [3, 4, 5],
+      "n_layers_total": 12,
+      "model_id": "EleutherAI/pythia-160m-deduped"
+    },
+    "pythia-410m": {
+      "layers": [6, 7, 8, 9, 10],
+      "n_layers_total": 24,
+      "model_id": "EleutherAI/pythia-410m-deduped"
+    },
+    "pythia-1b": {
+      "layers": [4, 5, 6, 7, 8],
+      "n_layers_total": 16,
+      "model_id": "EleutherAI/pythia-1b-deduped"
+    },
+    "pythia-2.8b": {
+      "layers": [8, 9, 10, 11, 12, 13, 14],
+      "n_layers_total": 32,
+      "model_id": "EleutherAI/pythia-2.8b-deduped"
+    },
+    "pythia-6.9b": {
+      "layers": [8, 9, 10, 11, 12, 13, 14],
+      "n_layers_total": 32,
+      "model_id": "EleutherAI/pythia-6.9b-deduped"
+    },
+    "pythia-12b": {
+      "layers": [9, 10, 11, 12, 13, 14, 15, 16],
+      "n_layers_total": 36,
+      "model_id": "EleutherAI/pythia-12b-deduped"
+    }
+  }
+}

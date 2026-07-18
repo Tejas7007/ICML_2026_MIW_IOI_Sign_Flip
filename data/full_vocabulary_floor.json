@@ -1,0 +1,9 @@
+{
+  "description": "Pythia-160M at the floor (step 2000): full-vocabulary behavior showing the model rarely emits either candidate name, yet ranks the repeated name above the correct one.",
+  "greedy_selects_neither_fraction": 0.9867,
+  "prob_repeated_name": 0.0238,
+  "prob_correct_name": 0.0118,
+  "mean_rank_repeated_name": 14.9,
+  "mean_rank_correct_name": 29.4,
+  "note": "Values as reported in Section 4 of the paper (full-vocabulary behavior at the floor)."
+}

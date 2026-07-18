@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite the workshop paper."
+title: "A Training-Time Sign Flip in IOI Circuit Formation"
+type: software
+authors:
+  - family-names: Dahiya
+    given-names: Tejas
+    affiliation: "University of Wisconsin-Madison"
+  - family-names: Blondin
+    given-names: Cole
+    affiliation: "Independent Researcher"
+repository-code: "https://github.com/Tejas7007/ICML_2026_MIW_IOI_Sign_Flip"
+url: "https://github.com/Tejas7007/ICML_2026_MIW_IOI_Sign_Flip"
+license: MIT
+version: "1.0.0"
+date-released: 2026-07-17
+preferred-citation:
+  type: conference-paper
+  title: "A Training-Time Sign Flip in IOI Circuit Formation"
+  authors:
+    - family-names: Dahiya
+      given-names: Tejas
+    - family-names: Blondin
+      given-names: Cole
+  collection-title: "Mechanistic Interpretability Workshop at the 43rd International Conference on Machine Learning"
+  year: 2026
