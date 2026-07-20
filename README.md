@@ -12,33 +12,47 @@ Mechanistic Interpretability Workshop at ICML 2026
 
 ## Overview
 
-This repository contains the code, result files, figures, and model checkpoint for **A Training-Time Sign Flip in IOI Circuit Formation**.
+This repository contains the public code, result files, figures, and protocol
+documentation for **A Training-Time Sign Flip in IOI Circuit Formation**.
 
 We study indirect object identification. In a prompt such as
 
 > When Mary and John went to the store, John gave a drink to ___
 
-the correct continuation is **Mary**, the name that appears once, rather than **John**, the repeated name. During training, Pythia models pass through a transient below-chance phase. At the Pythia-160M floor, replacing the residual-stream state at the repeated name's second occurrence, S2, with a matched non-repeating control improves the IO-versus-S logit difference by **+0.95**. At the final checkpoint, the same matched intervention changes it by **-4.12**.
+the correct continuation is **Mary**, the name mentioned once, rather than
+**John**, the repeated name. During training, Pythia models briefly prefer the
+repeated name on this two-name comparison.
 
-The positive-to-negative reversal appears across all six tested Pythia scales, nine PolyPythias training variants, and Stanford GPT-2 Small.
+At each checkpoint, we replace the residual-stream activations at the repeated
+name's second mention, S2, with activations from a matched prompt in which that
+mention contains a new name. In Pythia-160M, this replacement changes the
+IO-minus-S logit difference by **+0.95** at the lowest-accuracy checkpoint and
+by **-4.12** at the final checkpoint. The effect of the same replacement
+procedure therefore reverses across training.
+
+The reversal appears across all six tested Pythia scales, all nine tested
+PolyPythia training variants, and Stanford GPT-2 Small.
 
 ## Three measurements, three timelines
 
-Linear accessibility, position-level causal dependence, and suppressor function develop on different schedules. The held-out probe is already above chance during the window, the matched-S2 intervention later reverses sign, and robust suppressor function is detected after the below-chance phase.
+The paper separates three questions:
+
+1. Can a classifier read whether the name at S2 is repeated?
+2. Does changing the activations at S2 change the model's prediction?
+3. When does a mature repeated-name suppressor begin to help?
+
+These measurements change on different schedules. The held-out probe is only
+modestly above chance during the low-accuracy window, the matched-S2
+replacement later changes sign, and mature suppressor function becomes strong
+during recovery.
 
 <p align="center">
-  <img src="assets/three_timelines.svg" alt="Animated comparison of the probe, S2 intervention, and suppressor trajectories" width="94%" />
+  <img src="assets/three_timelines.svg" alt="Comparison of probe, S2 replacement, and suppressor trajectories" width="94%" />
 </p>
 
-## Scale replication
+## Main replication table
 
-The matched-S2 effect is positive at the floor and negative at maturity for every tested Pythia scale.
-
-<p align="center">
-  <img src="assets/scale_replication.svg" alt="Animated comparison of floor and maturity intervention effects across six Pythia scales" width="94%" />
-</p>
-
-| Model | Floor accuracy | Effect at floor | Effect at maturity | Patched layers |
+| Model | Floor accuracy | S2 effect at window | S2 effect at maturity | Patched layers |
 |:--|--:|--:|--:|:--|
 | Pythia-160M | 31.7% | +0.95 | -4.12 | 3 to 5 |
 | Pythia-410M | 29.3% | +0.11 | -3.63 | 6 to 10 |
@@ -47,51 +61,89 @@ The matched-S2 effect is positive at the floor and negative at maturity for ever
 | Pythia-6.9B | 32.3% | +0.84 | -4.12 | 8 to 14 |
 | Pythia-12B | 42.0% | +0.43 | -3.96 | 9 to 16 |
 
-For the primary Pythia-160M result, the template-clustered interval is **[+0.68, +1.25]** at the floor and **[-4.54, -3.72]** at maturity.
+For the primary Pythia-160M result, the template-clustered interval is
+**[+0.68, +1.25]** at the floor and **[-4.54, -3.72]** at maturity.
 
-## Additional validation
+## What is reproducible here
 
-At step 1000, an early below-chance checkpoint in the single-head sweep, zero-ablating any one attention head changes the mean IO-minus-S logit difference by at most **0.0704** across all 144 heads. This result is stored in [`data/head_zero_ablation_step1000.json`](data/head_zero_ablation_step1000.json) and can be reproduced with [`scripts/reproduce_head_ablation.py`](scripts/reproduce_head_ablation.py).
+The repository distinguishes three levels of support:
 
-For the PolyPythias variants, behavioral floors and matched-S2 intervention effects come from separate evaluations. [`data/polypythias_floors.json`](data/polypythias_floors.json) contains the minimum forced-choice accuracies from the 15-family behavioral sweep. [`data/polypythias_signflip_9variants.json`](data/polypythias_signflip_9variants.json) contains the effects from the separate 10-family causal evaluation.
+- **End-to-end reproduction** reruns the model experiment and writes a fresh
+  result file.
+- **Figure regeneration** rebuilds a paper figure from released result files.
+- **Stored-result verification** checks that every reported number matches the
+  committed JSON artifact.
 
-## Paper figures
+The following ICML-facing experiments now have standalone reproduction scripts:
 
-<p align="center">
-  <img src="figures/fig2_sign_flip.png" alt="Accuracy, matched-S2 intervention, and suppressor mean-ablation across Pythia-160M training" width="94%" />
-</p>
+| Analysis | Script |
+|---|---|
+| Matched-S2 intervention across Pythia scales | `scripts/reproduce_intervention.py` |
+| Step-1000 all-head zero-ablation sweep | `scripts/reproduce_head_ablation.py` |
+| Position-control battery | `scripts/reproduce_position_controls.py` |
+| Locked 800-prompt input-level control | `scripts/reproduce_input_control.py` |
+| Held-out and position-shuffle probes | `scripts/reproduce_probes.py` |
+| Mature-selected suppressor trajectory and characterization | `scripts/reproduce_suppressor_trajectory.py` |
+| Split-safe frozen suppressor-set trajectory | `scripts/reproduce_splitsafe_suppressors.py` |
+| Probe-direction removal | `scripts/reproduce_projection_removal.py` |
+| Stanford GPT-2 and PolyPythia replications | `scripts/reproduce_replications.py` |
+| Full-vocabulary floor analysis and sampled Pile loss | `scripts/reproduce_loss_and_vocabulary.py` |
 
-<table>
-<tr>
-<td width="50%" valign="top" align="center"><img src="figures/fig1_below_chance_dip.png" alt="Below-chance IOI window across six Pythia scales" width="88%"/></td>
-<td width="50%" valign="top" align="center"><img src="figures/fig3_loss_vs_accuracy.png" alt="Pile evaluation-sample loss and IOI accuracy" width="68%"/></td>
-</tr>
-</table>
+`data/splitsafe_single_head.json` is retained as a numerically verified
+historical artifact. Its exact selected-head identity and original producer
+were not retained in the consolidated release, so it is not classified as
+end-to-end reproducible. The split-safe set-level result has a complete
+standalone producer and is the recommended held-out robustness check.
+
+See [REPRODUCIBILITY.md](REPRODUCIBILITY.md) for commands, protocols, and a
+paper-to-code map.
 
 ## Installation
 
-For result verification and figure generation:
+For numerical checks and figure generation:
 
 ```bash
 python -m pip install numpy matplotlib
 ```
 
-For model inference:
+For model experiments:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-## Verify the reported results
+Large Pythia models require a CUDA device with sufficient memory. The smaller
+Pythia-160M experiments can run on CPU, but are substantially slower.
+
+## Verify every released number
 
 ```bash
 python scripts/verify_claims.py --verbose
+```
+
+The verifier checks the numerical values used in the paper, protocol metadata,
+figure files, model links, and accidental credential or machine-path leaks.
+
+## Regenerate the figures
+
+```bash
 python scripts/make_figures.py
 ```
 
-The verification script checks the numerical values used in the paper. The figure script regenerates all three paper figures from the JSON files in `data/`.
+<p align="center">
+  <img src="figures/fig2_sign_flip.png" alt="Accuracy, matched-S2 replacement, and suppressor mean-ablation across Pythia-160M training" width="94%" />
+</p>
 
-## Reproduce the central intervention
+<table>
+<tr>
+<td width="50%" valign="top" align="center"><img src="figures/fig1_below_chance_dip.png" alt="Below-chance IOI window across six Pythia scales" width="88%"/></td>
+<td width="50%" valign="top" align="center"><img src="figures/fig3_loss_vs_accuracy.png" alt="Pile sample loss and IOI accuracy" width="68%"/></td>
+</tr>
+</table>
+
+## Reproduce selected analyses
+
+Primary Pythia-160M intervention:
 
 ```bash
 python scripts/reproduce_intervention.py \
@@ -101,27 +153,76 @@ python scripts/reproduce_intervention.py \
   --save-per-example
 ```
 
-The experiment uses ten BABA-style IOI template families, 30 prompts per template, symmetric name-role swaps, seed 42, checkpoint-local matched controls, and the model-specific residual-stream window in [`config/patch_windows.json`](config/patch_windows.json).
+Position battery:
 
-The independently trained Pythia-160M checkpoint used in the split-safe analyses is available at [`teys7007/pythia-160m-seed42-dense`](https://huggingface.co/teys7007/pythia-160m-seed42-dense).
+```bash
+python scripts/reproduce_position_controls.py
+```
 
-More detailed instructions are available in [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md).
+Locked input-level control:
+
+```bash
+python scripts/reproduce_input_control.py
+```
+
+Probe controls:
+
+```bash
+python scripts/reproduce_probes.py
+```
+
+Suppressor analyses:
+
+```bash
+python scripts/reproduce_suppressor_trajectory.py
+python scripts/reproduce_splitsafe_suppressors.py
+```
+
+Projection removal:
+
+```bash
+python scripts/reproduce_projection_removal.py
+```
+
+Cross-model replications:
+
+```bash
+python scripts/reproduce_replications.py --suite all
+```
+
+Full-vocabulary and sampled-loss analyses:
+
+```bash
+python scripts/reproduce_loss_and_vocabulary.py --analysis all
+```
 
 ## Repository structure
 
 ```text
 .
-├── assets/             animated README visualizations
-├── config/             residual-patch windows
-├── data/               result files used by the paper
+├── assets/             README visualizations
+├── config/             patch windows and frozen-set protocol metadata
+├── data/               committed paper-facing result files
 ├── figures/            paper figures in PDF and PNG formats
-├── paper/              workshop paper
-├── scripts/            verification, plotting, and reproduction code
+├── paper/              compiled workshop paper
+├── scripts/
+│   ├── lib/            deterministic datasets and shared runtime helpers
+│   ├── reproduce_*.py  standalone ICML-facing producers
+│   ├── make_figures.py
+│   └── verify_claims.py
 ├── REPRODUCIBILITY.md
 ├── requirements.txt
 ├── CITATION.cff
 └── LICENSE
 ```
+
+## Scope
+
+This release is intentionally limited to the claims made in the ICML
+Mechanistic Interpretability Workshop paper: the training-time S2 sign
+reversal, its controls and replications, and the distinct timelines of probe
+readability and suppressor function. It does not include the broader mechanism
+claims developed for a separate EMNLP project.
 
 ## Citation
 
@@ -137,4 +238,6 @@ More detailed instructions are available in [`REPRODUCIBILITY.md`](REPRODUCIBILI
 
 ## License
 
-Code and configuration are released under the MIT License. Data, figures, and documentation are released under CC BY 4.0. Model checkpoints remain under their publishers' licenses.
+Code and configuration are released under the MIT License. Data, figures, and
+documentation are released under CC BY 4.0. Model checkpoints remain under
+their publishers' licenses.

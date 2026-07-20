@@ -1,0 +1,31 @@
+{
+  "model": "teys7007/pythia-160m-seed42-dense",
+  "mature_suppressor_heads": [
+    "L6H2",
+    "L6H7",
+    "L7H3",
+    "L7H7",
+    "L8H0",
+    "L8H5",
+    "L9H4",
+    "L9H11",
+    "L10H0",
+    "L10H2",
+    "L10H6",
+    "L10H7",
+    "L10H9",
+    "L11H1",
+    "L11H4"
+  ],
+  "discovery_partitions": [
+    {"benchmark_seed": 20260703, "split": "selection"},
+    {"benchmark_seed": 20260703, "split": "validation"},
+    {"benchmark_seed": 20260704, "split": "validation"}
+  ],
+  "strict_holdout": {"seed": 20260725, "n_items": 192},
+  "contrasts": ["XX<-YX", "YY<-XY"],
+  "held_constant": "S2 token identity",
+  "operation": "replace selected heads' hook_z output at END from matched donor",
+  "metric": "logit(IO) - max(logit(repeated S), logit(donor alternate name))",
+  "cluster_unit": "factorial item averaged across both contrasts"
+}
