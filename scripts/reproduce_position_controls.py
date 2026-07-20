@@ -144,7 +144,7 @@ def run_stage(model, step: int, layers: list[int], batch_size: int) -> dict:
                 ld = logits[ridx, io_ids] - logits[ridx, s_ids]
                 changed[arm].extend(ld.float().cpu().tolist())
 
-            del clean_cache, control_activations
+            del clean_cache
 
     base = np.asarray(base_values)
     arms = {}
