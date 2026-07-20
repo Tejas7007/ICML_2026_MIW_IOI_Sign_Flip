@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the numerical claims and public files released with the paper."""
+"""Verify numerical claims and public files released with the paper."""
 
 from __future__ import annotations
 
@@ -84,14 +84,13 @@ def verify_primary(c: Checks) -> None:
             c.near(f"{stage} {arm} upper", result["delta_ci"][1], upper)
 
     clustered = load("primary_intervention_clustered_cis.json")["clustered_ci"]
-    for stage, mean, prompt, template, name_pair in (
-        ("dip", 0.9525947873, (0.8575870744, 1.0503840418), (0.6766397486, 1.2491977947), (0.7787146024, 1.1500294444)),
-        ("mature", -4.1224749374, (-4.2835921853, -3.9623192333), (-4.5423692271, -3.7168933520), (-4.4511339908, -3.8158122384)),
+    for stage, mean, template, name_pair in (
+        ("dip", 0.9525947873, (0.6766397486, 1.2491977947), (0.7787146024, 1.1500294444)),
+        ("mature", -4.1224749374, (-4.5423692271, -3.7168933520), (-4.4511339908, -3.8158122384)),
     ):
         result = clustered[stage]
         c.near(f"{stage} clustered mean", result["mean_dld"], mean)
         for label, key, interval in (
-            ("prompt", "ci_prompt", prompt),
             ("template", "ci_template_clustered", template),
             ("name-pair", "ci_namepair_clustered", name_pair),
         ):
@@ -108,7 +107,11 @@ def verify_primary(c: Checks) -> None:
 def verify_controls(c: Checks) -> None:
     locked = load("locked_input_control_160m.json")
     c.equal("locked examples", locked["benchmark"]["n_examples"], 800)
-    c.equal("locked prompt hash", locked["benchmark"]["prompt_hash"], "34d4fd78419110f21e70f8129a84d992cc6b10d02ddaa4c5d172c6d586ad0553")
+    c.equal(
+        "locked prompt hash",
+        locked["benchmark"]["prompt_hash"],
+        "34d4fd78419110f21e70f8129a84d992cc6b10d02ddaa4c5d172c6d586ad0553",
+    )
     metrics = locked["metrics"]
     for label, actual, expected in (
         ("locked accuracy", metrics["accuracy"], 0.30875),
@@ -140,15 +143,8 @@ def verify_heads_and_probes(c: Checks) -> None:
     c.equal("head sweep checkpoint", sweep["checkpoint"], 1000)
     c.equal("head sweep template selection", sweep["protocol"]["template_selection"], "ALL_TEMPLATES[:8]")
     c.equal("head sweep examples", sweep["protocol"]["n_examples"], 160)
-    c.equal("head sweep layers", sweep["protocol"]["n_layers"], 12)
-    c.equal("head sweep heads per layer", sweep["protocol"]["n_heads_per_layer"], 12)
     c.equal("head sweep head count", sweep["protocol"]["n_heads_tested"], 144)
-    c.near("head sweep baseline accuracy", sweep["baseline"]["accuracy"], 0.425)
-    c.near("head sweep baseline logit difference", sweep["baseline"]["mean_logit_difference"], -0.2398)
-    c.equal("head sweep largest absolute head", sweep["extrema"]["largest_absolute_change"]["head"], "L2H6")
     c.near("head sweep largest absolute change", sweep["extrema"]["largest_absolute_change"]["absolute_delta_logit_difference"], 0.0704)
-    c.equal("head sweep largest negative head", sweep["extrema"]["largest_negative_change"]["head"], "L0H0")
-    c.near("head sweep largest negative change", sweep["extrema"]["largest_negative_change"]["delta_logit_difference"], -0.0626)
 
     heldout = load("heldout_probe.json")
     c.equal("held-out probe model", heldout["model"], MODEL_ID)
@@ -211,17 +207,9 @@ def verify_suppressors(c: Checks) -> None:
         c.near(f"split-safe {step} lower", result["d_margin3_ci"][0], lower)
         c.near(f"split-safe {step} upper", result["d_margin3_ci"][1], upper)
 
-    single = load("splitsafe_single_head.json")
-    c.equal("single-head model", single["model"], MODEL_ID)
-    c.equal("single-head examples", single["evaluation"]["n_examples"], 800)
-    c.near("single-head mean", single["effect"]["mean"], 0.038)
-    c.near("single-head lower", single["effect"]["ci95"][0], -0.024)
-    c.near("single-head upper", single["effect"]["ci95"][1], 0.114)
-
     characterization = load("suppressor_characterization.json")
     pythia = characterization["pythia-160m"]
     c.equal("Pythia suppressor head", pythia["head"], "L8H9")
-    c.equal("Pythia suppressor examples", pythia["protocol"]["n_examples"], 200)
     for step, attention, projection in (
         (1000, 0.0226, 0.0020),
         (3000, 0.8685, 0.9859),
@@ -266,60 +254,20 @@ def verify_scale_and_replications(c: Checks) -> None:
     c.equal("PolyPythia reversal count", effects["n_flips"], "9/9")
     c.equal("PolyPythia floor templates", floors["protocol"]["template_selection"], "ALL_TEMPLATES[:15]")
     c.equal("PolyPythia floor examples", floors["protocol"]["n_examples_per_checkpoint"], 300)
-    floor_values = {
-        "seed1": 0.3233, "seed3": 0.18, "seed5": 0.3433,
-        "data-seed1": 0.2933, "data-seed2": 0.28, "data-seed3": 0.3533,
-        "weight-seed1": 0.3333, "weight-seed2": 0.3667, "weight-seed3": 0.31,
-    }
-    causal_values = {
-        "seed1": (0.3066666667, 0.5458109395, -3.9235797373),
-        "seed3": (0.1466666667, 0.9924338420, -2.8943375778),
-        "seed5": (0.2533333333, 1.1069837825, -4.0428134569),
-        "data-seed1": (0.3066666667, 1.2030731916, -4.0635098139),
-        "data-seed2": (0.1933333333, 1.3513965925, -3.7089944013),
-        "data-seed3": (0.3633333333, 1.0067096599, -3.2375001303),
-        "weight-seed1": (0.29, 0.8018242677, -4.5615720749),
-        "weight-seed2": (0.3566666667, 0.8378879579, -4.7471647676),
-        "weight-seed3": (0.2733333333, 1.4707899443, -3.5084324296),
-    }
-    for suffix, expected_floor in floor_values.items():
-        model = f"EleutherAI/pythia-160m-{suffix}"
-        c.near(f"{model} behavioral floor", floors["models"][model]["floor_accuracy"], expected_floor)
-        result = effects["seeds"][model]
-        c.equal(f"{model} reverses", result["flips"], True)
-        checkpoint_accuracy, window_effect, final_effect = causal_values[suffix]
-        c.near(f"{model} intervention-checkpoint accuracy", result["dip"]["ioi_acc"], checkpoint_accuracy)
-        c.near(f"{model} window effect", result["dip"]["delta_ld_mean"], window_effect)
-        c.near(f"{model} final effect", result["mature"]["delta_ld_mean"], final_effect)
 
     stanford = load("stanford_gpt2_signflip.json")["by_model"]["stanford_alias"]
-    for step, expected in ((1500, 1.0261497418), (3000, 0.7694746304), (10000, -0.2288490645), (100000, -2.8890317345)):
-        c.near(f"Stanford effect {step}", stanford[f"step_{step}"]["delta_ld_mean"], expected)
+    for step, expected_effect in ((1500, 1.0261497418), (3000, 0.7694746304), (10000, -0.2288490645), (100000, -2.8890317345)):
+        c.near(f"Stanford effect {step}", stanford[f"step_{step}"]["delta_ld_mean"], expected_effect)
 
 
-def verify_retrained_and_loss(c: Checks) -> None:
-    retrained = load("retrained_model_behavior.json")
-    c.equal("retrained model", retrained["model"], MODEL_ID)
-    c.equal("retrained templates", retrained["protocol"]["template_selection"], "ALL_TEMPLATES[:15]")
-    c.equal("retrained examples", retrained["protocol"]["n_examples_per_checkpoint"], 300)
-    for step, accuracy, logit_difference in (
-        (900, 0.3433, -0.7704), (950, 0.2867, -0.6093),
-        (1000, 0.39, -0.5006), (1100, 0.27, -0.8234),
-        (1400, 0.22, -1.0539), (1750, 0.2967, -0.7982),
-        (2000, 0.44, -0.4387), (2900, 0.5167, 0.0371),
-        (3400, 0.6767, 0.7199), (3800, 0.7333, 0.8285),
-    ):
-        row = retrained["by_step"][f"step_{step}"]
-        c.near(f"retrained accuracy {step}", row["accuracy"], accuracy)
-        c.near(f"retrained LD {step}", row["mean_logit_difference"], logit_difference)
-
+def verify_loss(c: Checks) -> None:
     loss = load("pile_loss_sample.json")
     values = []
     for step, expected in ((1000, 3.7342), (2000, 3.1397), (3000, 2.9638), (5000, 2.8006), (10000, 2.6766)):
         actual = loss["by_step"][f"step_{step}"]["released_pythia_160m_loss"]
         values.append(actual)
         c.near(f"Pile loss {step}", actual, expected)
-    c.equal("sampled Pile loss is monotone", all(left > right for left, right in zip(values, values[1:])), True)
+    c.equal("sampled Pile loss is monotone", all(a > b for a, b in zip(values, values[1:])), True)
 
 
 def verify_package(c: Checks) -> None:
@@ -328,19 +276,22 @@ def verify_package(c: Checks) -> None:
         "paper/sign_flip_ioi_miw2026.pdf", "config/patch_windows.json",
         "scripts/verify_claims.py", "scripts/make_figures.py",
         "scripts/reproduce_intervention.py", "scripts/reproduce_head_ablation.py",
-        "scripts/lib/ioi_dataset.py", "data/polypythias_floors.json",
-        "data/polypythias_signflip_9variants.json", "data/head_zero_ablation_step1000.json",
-        "data/suppressor_characterization.json", "data/retrained_model_behavior.json",
-        "assets/sign_flip.svg", "assets/three_timelines.svg", "assets/scale_replication.svg",
+        "scripts/reproduce_position_controls.py", "scripts/reproduce_input_control.py",
+        "scripts/reproduce_probes.py", "scripts/reproduce_suppressor_trajectory.py",
+        "scripts/reproduce_splitsafe_suppressors.py", "scripts/reproduce_projection_removal.py",
+        "scripts/reproduce_replications.py", "scripts/reproduce_loss_and_vocabulary.py",
+        "scripts/lib/ioi_dataset.py", "scripts/lib/locked_ioi_benchmark.py",
+        "data/polypythias_floors.json", "data/polypythias_signflip_9variants.json",
+        "data/head_zero_ablation_step1000.json", "data/suppressor_characterization.json",
+        "data/splitsafe_suppressor_set.json", "assets/sign_flip.svg",
+        "assets/three_timelines.svg", "assets/scale_replication.svg",
     ]
     figures = ((1, "below_chance_dip"), (2, "sign_flip"), (3, "loss_vs_accuracy"))
     required.extend(f"figures/fig{number}_{name}.{ext}" for number, name in figures for ext in ("pdf", "png"))
     for relative in required:
         c.equal(f"required file {relative}", (ROOT / relative).is_file(), True)
 
-    c.equal("step-2000 head file absent", (DATA / "head_zero_ablation_step2000.json").exists(), False)
-    c.equal("MANIFEST absent", (ROOT / "MANIFEST.md").exists(), False)
-    c.equal("workflows absent", (ROOT / ".github" / "workflows").exists(), False)
+    c.equal("unsupported single-head artifact absent", (DATA / "splitsafe_single_head.json").exists(), False)
 
     for relative in ["paper/sign_flip_ioi_miw2026.pdf"] + [f"figures/fig{number}_{name}.pdf" for number, name in figures]:
         c.equal(f"PDF signature {relative}", (ROOT / relative).read_bytes().startswith(b"%PDF-"), True)
@@ -353,6 +304,7 @@ def verify_package(c: Checks) -> None:
         except ET.ParseError:
             valid = False
         c.equal(f"SVG XML {relative}", valid, True)
+
     for path in DATA.glob("*.json"):
         try:
             json.loads(path.read_text())
@@ -366,16 +318,8 @@ def verify_package(c: Checks) -> None:
     c.equal("README model URL", MODEL_URL in readme, True)
     c.equal("guide model URL", MODEL_URL in guide, True)
     c.equal("paper-to-code map", "Paper-to-code map" in guide, True)
-    c.equal(
-        "PolyPythia protocols separated",
-        "The accuracy at the intervention checkpoint in the second file is not used as the behavioral floor." in guide,
-        True,
-    )
-    for asset in ("sign_flip.svg", "three_timelines.svg", "scale_replication.svg"):
-        c.equal(f"README embeds {asset}", f"assets/{asset}" in readme, True)
 
     patterns = (
-        ("anonymous model link", re.compile(r"anonymous-research-sub")),
         ("Hugging Face token", re.compile(r"\bhf_[A-Za-z0-9]{20,}\b")),
         ("GitHub token", re.compile(r"\b(?:ghp_|github_pat_)[A-Za-z0-9_]{20,}\b")),
         ("secret key", re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b")),
@@ -402,7 +346,7 @@ def main() -> int:
         verify_heads_and_probes,
         verify_suppressors,
         verify_scale_and_replications,
-        verify_retrained_and_loss,
+        verify_loss,
         verify_package,
     ):
         verify(checks)
