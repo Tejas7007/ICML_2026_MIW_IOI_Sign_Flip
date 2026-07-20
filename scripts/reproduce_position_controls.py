@@ -69,9 +69,14 @@ def run_stage(model, step: int, layers: list[int], batch_size: int) -> dict:
                 base_logits, clean_cache = model.run_with_cache(
                     clean_tokens, names_filter=lambda name: name in hook_names
                 )
-                _, control_cache = model.run_with_cache(
+                _, raw_control_cache = model.run_with_cache(
                     control_tokens, names_filter=lambda name: name in hook_names
                 )
+            control_activations = {
+                name: raw_control_cache[name] for name in hook_names
+            }
+            del raw_control_cache
+
             base_final = base_logits[:, -1]
             io_ids = torch.tensor(
                 [model.to_single_token(" " + r.io_name) for r in batch_records],
@@ -107,7 +112,7 @@ def run_stage(model, step: int, layers: list[int], batch_size: int) -> dict:
                 for layer in layers:
                     name = f"blocks.{layer}.hook_resid_post"
                     if arm == "real_S2":
-                        donor = control_cache[name]
+                        donor = control_activations[name]
                         p = torch.tensor(positions["S2"], device=model.cfg.device)
 
                         def patch(value, hook, donor=donor, p=p):
@@ -139,7 +144,7 @@ def run_stage(model, step: int, layers: list[int], batch_size: int) -> dict:
                 ld = logits[ridx, io_ids] - logits[ridx, s_ids]
                 changed[arm].extend(ld.float().cpu().tolist())
 
-            del clean_cache, control_cache
+            del clean_cache, control_activations
 
     base = np.asarray(base_values)
     arms = {}
