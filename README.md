@@ -64,17 +64,7 @@ during recovery.
 For the primary Pythia-160M result, the template-clustered interval is
 **[+0.68, +1.25]** at the floor and **[-4.54, -3.72]** at maturity.
 
-## What is reproducible here
-
-The repository distinguishes three levels of support:
-
-- **End-to-end reproduction** reruns the model experiment and writes a fresh
-  result file.
-- **Figure regeneration** rebuilds a paper figure from released result files.
-- **Stored-result verification** checks that every reported number matches the
-  committed JSON artifact.
-
-The following ICML-facing experiments now have standalone reproduction scripts:
+## Reproduction scripts
 
 | Analysis | Script |
 |---|---|
@@ -89,14 +79,8 @@ The following ICML-facing experiments now have standalone reproduction scripts:
 | Stanford GPT-2 and PolyPythia replications | `scripts/reproduce_replications.py` |
 | Full-vocabulary floor analysis and sampled Pile loss | `scripts/reproduce_loss_and_vocabulary.py` |
 
-`data/splitsafe_single_head.json` is retained as a numerically verified
-historical artifact. Its exact selected-head identity and original producer
-were not retained in the consolidated release, so it is not classified as
-end-to-end reproducible. The split-safe set-level result has a complete
-standalone producer and is the recommended held-out robustness check.
-
-See [REPRODUCIBILITY.md](REPRODUCIBILITY.md) for commands, protocols, and a
-paper-to-code map.
+See [REPRODUCIBILITY.md](REPRODUCIBILITY.md) for commands, exact protocols,
+and the paper-to-code map.
 
 ## Installation
 
@@ -115,7 +99,7 @@ python -m pip install -r requirements.txt
 Large Pythia models require a CUDA device with sufficient memory. The smaller
 Pythia-160M experiments can run on CPU, but are substantially slower.
 
-## Verify every released number
+## Verify the released numbers
 
 ```bash
 python scripts/verify_claims.py --verbose
@@ -143,56 +127,16 @@ python scripts/make_figures.py
 
 ## Reproduce selected analyses
 
-Primary Pythia-160M intervention:
-
 ```bash
-python scripts/reproduce_intervention.py \
-  --model pythia-160m \
-  --step 2000 \
-  --output results/pythia-160m_step2000.json \
-  --save-per-example
-```
-
-Position battery:
-
-```bash
+python scripts/reproduce_intervention.py --model pythia-160m --step 2000 \
+  --output results/pythia-160m_step2000.json --save-per-example
 python scripts/reproduce_position_controls.py
-```
-
-Locked input-level control:
-
-```bash
 python scripts/reproduce_input_control.py
-```
-
-Probe controls:
-
-```bash
 python scripts/reproduce_probes.py
-```
-
-Suppressor analyses:
-
-```bash
 python scripts/reproduce_suppressor_trajectory.py
 python scripts/reproduce_splitsafe_suppressors.py
-```
-
-Projection removal:
-
-```bash
 python scripts/reproduce_projection_removal.py
-```
-
-Cross-model replications:
-
-```bash
 python scripts/reproduce_replications.py --suite all
-```
-
-Full-vocabulary and sampled-loss analyses:
-
-```bash
 python scripts/reproduce_loss_and_vocabulary.py --analysis all
 ```
 
