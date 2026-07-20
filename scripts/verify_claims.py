@@ -272,7 +272,7 @@ def verify_loss(c: Checks) -> None:
 
 def verify_package(c: Checks) -> None:
     required = [
-        "README.md", "REPRODUCIBILITY.md", "CITATION.cff", "LICENSE", "requirements.txt",
+        "README.md", "CITATION.cff", "LICENSE", "requirements.txt",
         "paper/sign_flip_ioi_miw2026.pdf", "config/patch_windows.json",
         "scripts/verify_claims.py", "scripts/make_figures.py",
         "scripts/reproduce_intervention.py", "scripts/reproduce_head_ablation.py",
@@ -292,6 +292,7 @@ def verify_package(c: Checks) -> None:
         c.equal(f"required file {relative}", (ROOT / relative).is_file(), True)
 
     c.equal("unsupported single-head artifact absent", (DATA / "splitsafe_single_head.json").exists(), False)
+    c.equal("standalone reproducibility document absent", (ROOT / "REPRODUCIBILITY.md").exists(), False)
 
     for relative in ["paper/sign_flip_ioi_miw2026.pdf"] + [f"figures/fig{number}_{name}.pdf" for number, name in figures]:
         c.equal(f"PDF signature {relative}", (ROOT / relative).read_bytes().startswith(b"%PDF-"), True)
@@ -314,10 +315,8 @@ def verify_package(c: Checks) -> None:
         c.equal(f"JSON {path.name}", valid, True)
 
     readme = (ROOT / "README.md").read_text()
-    guide = (ROOT / "REPRODUCIBILITY.md").read_text()
     c.equal("README model URL", MODEL_URL in readme, True)
-    c.equal("guide model URL", MODEL_URL in guide, True)
-    c.equal("paper-to-code map", "Paper-to-code map" in guide, True)
+    c.equal("README reproduction scripts", "Reproduction scripts" in readme, True)
 
     patterns = (
         ("Hugging Face token", re.compile(r"\bhf_[A-Za-z0-9]{20,}\b")),
