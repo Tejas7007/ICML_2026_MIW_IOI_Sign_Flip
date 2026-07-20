@@ -54,7 +54,7 @@ TEMPLATE_FAMILIES: tuple[TemplateFamily, ...] = (
     TemplateFamily(8, "While {IO} and {S1} were working at the {PLACE}, {S2} gave a {OBJECT} to",
                    "While {S1} and {IO} were working at the {PLACE}, {S2} gave a {OBJECT} to", "place"),
     TemplateFamily(9, "While {IO} and {S1} were commuting to the {PLACE}, {S2} gave a {OBJECT} to",
-                   "While {S1} and {IO} were commuting to the {PLACE}. {S2} gave a {OBJECT} to", "place"),
+                   "While {S1} and {IO} were commuting to the {PLACE}, {S2} gave a {OBJECT} to", "place"),
     TemplateFamily(10, "After the lunch, {IO} and {S1} went to the {PLACE}. {S2} gave a {OBJECT} to",
                     "After the lunch, {S1} and {IO} went to the {PLACE}. {S2} gave a {OBJECT} to", "place"),
     TemplateFamily(11, "Afterwards, {IO} and {S1} went to the {PLACE}. {S2} gave a {OBJECT} to",
