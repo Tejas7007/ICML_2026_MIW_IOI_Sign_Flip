@@ -1,0 +1,29 @@
+name: Static diagnostics artifact
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python -m pip install ruff
+      - name: Run checks
+        run: |
+          python -m compileall -q scripts
+          set +e
+          ruff check scripts --select E9,F63,F7,F82 > ruff-output.txt 2>&1
+          status=$?
+          echo "$status" > ruff-status.txt
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-diagnostics
+          path: |
+            ruff-output.txt
+            ruff-status.txt
