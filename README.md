@@ -79,8 +79,8 @@ For the primary Pythia-160M result, the template-clustered interval is
 | Stanford GPT-2 and PolyPythia replications | `scripts/reproduce_replications.py` |
 | Full-vocabulary floor analysis and sampled Pile loss | `scripts/reproduce_loss_and_vocabulary.py` |
 
-See [REPRODUCIBILITY.md](REPRODUCIBILITY.md) for commands, exact protocols,
-and the paper-to-code map.
+Protocol details are documented in the paper appendix, script help text, and
+committed configuration files.
 
 ## Installation
 
@@ -154,7 +154,6 @@ python scripts/reproduce_loss_and_vocabulary.py --analysis all
 │   ├── reproduce_*.py  standalone ICML-facing producers
 │   ├── make_figures.py
 │   └── verify_claims.py
-├── REPRODUCIBILITY.md
 ├── requirements.txt
 ├── CITATION.cff
 └── LICENSE
