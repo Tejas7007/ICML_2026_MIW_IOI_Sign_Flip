@@ -1,41 +1,24 @@
 # Reproducing the results
 
-This guide distinguishes rerunning a model experiment from checking a stored
-result. The distinction matters because `scripts/verify_claims.py` validates
-the committed paper numbers without downloading models, while the
-`reproduce_*.py` scripts perform new model inference.
+The public scripts in this repository rerun the ICML workshop paper's model
+experiments from released checkpoints and deterministic prompt generators.
+`scripts/verify_claims.py` is a fast CPU-only consistency check over the
+committed result files; it does not rerun model inference.
 
 ## Environment
-
-Numerical verification and figure generation require Python 3.10 or newer,
-NumPy, and Matplotlib.
-
-```bash
-python -m pip install numpy matplotlib
-```
-
-Model inference additionally requires PyTorch, Transformers,
-TransformerLens, scikit-learn, and Hugging Face Datasets.
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-## Support levels
-
-| Status | Meaning |
-|---|---|
-| End-to-end reproducible | A public script rebuilds the result from model checkpoints and deterministic prompts. |
-| Regenerated from released results | A public script recreates a figure or table from committed JSON. |
-| Numerically verified stored artifact | The committed values are checked, but the exact original producer is not consolidated here. |
+Python 3.10 or newer is recommended. GPU memory requirements depend on model
+size. Pythia-160M analyses can run on CPU, but are substantially slower.
 
 ## Verify the released package
 
 ```bash
 python scripts/verify_claims.py --verbose
 ```
-
-This is a fast, CPU-only consistency check. It does not rerun model inference.
 
 ## Regenerate the figures
 
@@ -57,10 +40,10 @@ python scripts/reproduce_intervention.py \
 
 The intervention uses ten BABA-style IOI template families, 30 prompts per
 family, symmetric name-role swaps, and seed 42. For every prompt, the matched
-control changes only S2, replacing the repeated name with a third
-single-token name. At each configured layer, the residual-stream activation
-at S2 in the original run is replaced with the activation at the same position
-from the control run.
+control changes only S2, replacing the repeated name with a third single-token
+name. At each configured layer, the residual-stream activation at S2 in the
+original run is replaced with the activation at the same position from the
+control run.
 
 The measured effect is the change in
 
@@ -68,10 +51,10 @@ The measured effect is the change in
 logit(IO) - logit(S)
 ```
 
-Positive values move the model toward the correct name. Negative values move
-it toward the repeated name. Each checkpoint supplies its own control
-activations, so the experiment compares the effect of one fixed procedure,
-not one fixed activation vector.
+Positive values move the model toward the correct name. Negative values move it
+toward the repeated name. Each checkpoint supplies its own control activations,
+so the experiment compares the effect of one fixed procedure, not one fixed
+activation vector.
 
 The runner reports a prompt-bootstrap interval. Dependence-aware intervals for
 Pythia-160M are stored in `data/primary_intervention_clustered_cis.json`.
@@ -120,7 +103,7 @@ python scripts/reproduce_loss_and_vocabulary.py --analysis loss
 ```
 
 The vocabulary analysis evaluates all 300 prompts at Pythia-160M step 2000 and
-reports the candidate probabilities, vocabulary ranks, and fraction for which
+reports candidate probabilities, vocabulary ranks, and the fraction for which
 the top token is neither candidate.
 
 The sampled-loss procedure streams the `monology/pile-uncopyrighted` training
@@ -151,8 +134,8 @@ mature suppressor analysis.
 python scripts/reproduce_probes.py
 ```
 
-For the held-out probe, the positive class is the residual-stream activation
-at S2 in the repeated-name prompt. The negative class is the activation at the
+For the held-out probe, the positive class is the residual-stream activation at
+S2 in the repeated-name prompt. The negative class is the activation at the
 same position in its matched non-repeating control. Selection and validation
 partitions use disjoint name sets and template families. Each fold trains on
 600 activation examples and evaluates on 600 examples; the folds swap the
@@ -170,16 +153,16 @@ regularization 50 is trained on one random half and evaluated on the other.
 python scripts/reproduce_suppressor_trajectory.py
 ```
 
-For Pythia-160M and Pythia-410M, the script mean-ablates every head at
-maturity, selects the head whose ablation most reduces mature IO-minus-S logit
-difference, fixes that identity, and mean-ablates the same head at each earlier
-checkpoint. A negative ablation effect means that removing the head lowers the
-IO-minus-S logit difference, so the intact head supports the correct name.
+For Pythia-160M and Pythia-410M, the script mean-ablates every head at maturity,
+selects the head whose ablation most reduces mature IO-minus-S logit difference,
+fixes that identity, and mean-ablates the same head at each earlier checkpoint.
+A negative ablation effect means that removing the head lowers the IO-minus-S
+logit difference, so the intact head supports the correct name.
 
-The script also measures attention to S2 and direct IO-minus-S output
-projection for Pythia-160M L8H9 at selected checkpoints, and characterizes
-Stanford GPT-2 Small L10H10 at maturity. It does not claim a Stanford
-training-time suppressor trajectory.
+The script also measures attention to S2 and direct IO-minus-S output projection
+for Pythia-160M L8H9 at selected checkpoints, and characterizes Stanford GPT-2
+Small L10H10 at maturity. It does not claim a Stanford training-time suppressor
+trajectory.
 
 ## Split-safe frozen suppressor-set trajectory
 
@@ -217,15 +200,6 @@ logit(IO) - max(logit(repeated S), logit(donor alternate name))
 The two directions are averaged within each item before bootstrapping the 192
 item means.
 
-### Historical single-head artifact
-
-`data/splitsafe_single_head.json` records a separate 800-example result with
-mean 0.038 and interval [-0.024, 0.114]. The exact selected-head identity and
-original producer were not retained in the consolidated release. It is
-therefore classified as a numerically verified stored artifact, not an
-end-to-end reproduction. The fully documented set-level analysis above is the
-recommended split-safe robustness result.
-
 ## Probe-direction removal
 
 ```bash
@@ -240,11 +214,11 @@ activations. Its normalized weight vector `d` is removed at strengths 0.5, 1,
 h' = h - strength * (h dot d) * d
 ```
 
-The script also tests an orthogonal direction, a shuffled-label probe
-direction, and five random unit directions. The reported values are point
-estimates. This experiment tests one learned direction at one layer and
-checkpoint; it does not rule out other linear directions, distributed
-representations, or nonlinear encodings.
+The script also tests an orthogonal direction, a shuffled-label probe direction,
+and five random unit directions. The reported values are point estimates. This
+experiment tests one learned direction at one layer and checkpoint; it does not
+rule out other linear directions, distributed representations, or nonlinear
+encodings.
 
 ## Cross-model replications
 
@@ -253,36 +227,35 @@ python scripts/reproduce_replications.py --suite stanford
 python scripts/reproduce_replications.py --suite polypythias
 ```
 
-Stanford GPT-2 Small uses `stanford-crfm/alias-gpt2-small-x21`, revisions of
-the form `checkpoint-{step}`, 300 prompts, and layers 3 through 5.
+Stanford GPT-2 Small uses `stanford-crfm/alias-gpt2-small-x21`, revisions of the
+form `checkpoint-{step}`, 300 prompts, and layers 3 through 5.
 
-The nine PolyPythia variants use step 2000 for the causal window evaluation and
-step 143000 for maturity. These intervention checkpoints are separate from the
-15-family behavioral-floor sweep in `data/polypythias_floors.json`.
-The accuracy at the intervention checkpoint in the second file is not used as
-the behavioral floor.
+The nine PolyPythia variants use step 2000 for the intervention-window
+evaluation and step 143000 for maturity. These intervention checkpoints are
+separate from the 15-family behavioral-floor sweep in
+`data/polypythias_floors.json`. The accuracy at the intervention checkpoint is
+not used as the behavioral floor.
 
 ## Paper-to-code map
 
-| Paper result | Released data | Public producer or support | Status |
-|---|---|---|---|
-| Figures 1–3 | cross-scale, suppressor, and loss JSONs | `scripts/make_figures.py` | Regenerated from released results |
-| Primary matched-S2 reversal | `signflip_across_scale_160m_410m_1b.json`, `primary_intervention_clustered_cis.json` | `scripts/reproduce_intervention.py` | End-to-end reproducible |
-| Position battery | `position_control_battery.json` | `scripts/reproduce_position_controls.py` | End-to-end reproducible |
-| Locked input control | `locked_input_control_160m.json` | `scripts/reproduce_input_control.py` | End-to-end reproducible |
-| Full-vocabulary floor | `full_vocabulary_floor.json` | `scripts/reproduce_loss_and_vocabulary.py` | End-to-end reproducible |
-| Sampled Pile loss | `pile_loss_sample.json` | `scripts/reproduce_loss_and_vocabulary.py` | End-to-end subject to external stream ordering |
-| Step-1000 head sweep | `head_zero_ablation_step1000.json` | `scripts/reproduce_head_ablation.py` | End-to-end reproducible |
-| Held-out probe | `heldout_probe.json` | `scripts/reproduce_probes.py` | End-to-end reproducible |
-| Position-shuffle probe | `position_shuffle_probe.json` | `scripts/reproduce_probes.py` | End-to-end reproducible |
-| Suppressor trajectory | `suppressor_ablation_trajectory.json` | `scripts/reproduce_suppressor_trajectory.py` | End-to-end reproducible |
-| Suppressor characterization | `suppressor_characterization.json` | `scripts/reproduce_suppressor_trajectory.py` | End-to-end reproducible |
-| Split-safe suppressor set | `splitsafe_suppressor_set.json` | `scripts/reproduce_splitsafe_suppressors.py` | End-to-end reproducible |
-| Split-safe single head | `splitsafe_single_head.json` | no exact producer retained | Numerically verified stored artifact |
-| Six Pythia scales | cross-scale JSONs and `config/patch_windows.json` | `scripts/reproduce_intervention.py` | End-to-end reproducible |
-| Nine PolyPythias | `polypythias_signflip_9variants.json` | `scripts/reproduce_replications.py` | End-to-end reproducible |
-| Stanford GPT-2 | `stanford_gpt2_signflip.json` | `scripts/reproduce_replications.py` | End-to-end reproducible |
-| Projection removal | `projection_removal.json` | `scripts/reproduce_projection_removal.py` | End-to-end reproducible |
+| Paper result | Released data | Public producer |
+|---|---|---|
+| Figures 1–3 | cross-scale, suppressor, and loss JSONs | `scripts/make_figures.py` |
+| Primary matched-S2 reversal | `signflip_across_scale_160m_410m_1b.json`, `primary_intervention_clustered_cis.json` | `scripts/reproduce_intervention.py` |
+| Position battery | `position_control_battery.json` | `scripts/reproduce_position_controls.py` |
+| Locked input control | `locked_input_control_160m.json` | `scripts/reproduce_input_control.py` |
+| Full-vocabulary floor | `full_vocabulary_floor.json` | `scripts/reproduce_loss_and_vocabulary.py` |
+| Sampled Pile loss | `pile_loss_sample.json` | `scripts/reproduce_loss_and_vocabulary.py` |
+| Step-1000 head sweep | `head_zero_ablation_step1000.json` | `scripts/reproduce_head_ablation.py` |
+| Held-out probe | `heldout_probe.json` | `scripts/reproduce_probes.py` |
+| Position-shuffle probe | `position_shuffle_probe.json` | `scripts/reproduce_probes.py` |
+| Suppressor trajectory | `suppressor_ablation_trajectory.json` | `scripts/reproduce_suppressor_trajectory.py` |
+| Suppressor characterization | `suppressor_characterization.json` | `scripts/reproduce_suppressor_trajectory.py` |
+| Split-safe suppressor set | `splitsafe_suppressor_set.json` | `scripts/reproduce_splitsafe_suppressors.py` |
+| Six Pythia scales | cross-scale JSONs and `config/patch_windows.json` | `scripts/reproduce_intervention.py` |
+| Nine PolyPythias | `polypythias_signflip_9variants.json` | `scripts/reproduce_replications.py` |
+| Stanford GPT-2 | `stanford_gpt2_signflip.json` | `scripts/reproduce_replications.py` |
+| Projection removal | `projection_removal.json` | `scripts/reproduce_projection_removal.py` |
 
 ## Scope boundary
 
