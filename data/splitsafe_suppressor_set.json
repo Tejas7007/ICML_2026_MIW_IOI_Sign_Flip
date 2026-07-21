@@ -1,0 +1,57 @@
+{
+  "description": "Frozen mature suppressor-set trajectory on the independently trained Pythia-160M model.",
+  "model": "teys7007/pythia-160m-seed42-dense",
+  "reproduction_status": "end-to-end reproducible with scripts/reproduce_splitsafe_suppressors.py",
+  "selection": {
+    "stage": "maturity",
+    "operation": "matched full hook_z replacement at END",
+    "ranking": "most negative selection-split d_ld effects",
+    "validation_rule": [
+      "selection and validation confidence intervals are negative",
+      "validation d_logit_S is positive",
+      "both matched directions have negative d_ld"
+    ],
+    "frozen_heads": [
+      "L6H2",
+      "L6H7",
+      "L7H3",
+      "L7H7",
+      "L8H0",
+      "L8H5",
+      "L9H4",
+      "L9H11",
+      "L10H0",
+      "L10H2",
+      "L10H6",
+      "L10H7",
+      "L10H9",
+      "L11H1",
+      "L11H4"
+    ]
+  },
+  "holdout": {
+    "n_items": 192,
+    "contrasts_per_item": 2,
+    "n_observations_per_checkpoint": 384,
+    "contrasts": ["XX<-YX", "YY<-XY"],
+    "held_constant": "S2 token identity",
+    "excludes_discovery_names_and_template_families": true,
+    "seed": 20260725,
+    "bootstrap_unit": "factorial item after averaging both contrasts"
+  },
+  "metric": {
+    "name": "fair three-way margin",
+    "formula": "logit(IO) - max(logit(repeated S), logit(donor alternate name))",
+    "reported_effect": "patched margin minus base margin"
+  },
+  "condition": "mature_suppressors_full_z",
+  "n_items_per_checkpoint": 192,
+  "n_observations_per_checkpoint": 384,
+  "by_step": {
+    "step_1800": {"d_margin3_mean": 0.0933, "d_margin3_ci": [0.0618, 0.1252]},
+    "step_2000": {"d_margin3_mean": 0.0914, "d_margin3_ci": [0.0622, 0.1206]},
+    "step_3200": {"d_margin3_mean": -0.0515, "d_margin3_ci": [-0.1148, 0.0138]},
+    "step_5000": {"d_margin3_mean": -0.0794, "d_margin3_ci": [-0.1631, 0.0058]},
+    "step_6000": {"d_margin3_mean": -0.6359, "d_margin3_ci": [-0.8017, -0.4679]}
+  }
+}

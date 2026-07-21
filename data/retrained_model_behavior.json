@@ -1,0 +1,56 @@
+{
+  "model": "teys7007/pythia-160m-seed42-dense",
+  "protocol": {
+    "template_selection": "ALL_TEMPLATES[:15]",
+    "template_order": "the first fifteen BABA-style template families",
+    "template_families": 15,
+    "prompts_per_template": 20,
+    "symmetric_name_role_swaps": true,
+    "seed": 42,
+    "n_examples_per_checkpoint": 300,
+    "metric": "IO-versus-S forced-choice accuracy and mean IO-minus-S logit difference",
+    "note": "Selected checkpoints from the independently trained model trajectory."
+  },
+  "by_step": {
+    "step_900": {
+      "accuracy": 0.3433,
+      "mean_logit_difference": -0.7704
+    },
+    "step_950": {
+      "accuracy": 0.2867,
+      "mean_logit_difference": -0.6093
+    },
+    "step_1000": {
+      "accuracy": 0.39,
+      "mean_logit_difference": -0.5006
+    },
+    "step_1100": {
+      "accuracy": 0.27,
+      "mean_logit_difference": -0.8234
+    },
+    "step_1400": {
+      "accuracy": 0.22,
+      "mean_logit_difference": -1.0539
+    },
+    "step_1750": {
+      "accuracy": 0.2967,
+      "mean_logit_difference": -0.7982
+    },
+    "step_2000": {
+      "accuracy": 0.44,
+      "mean_logit_difference": -0.4387
+    },
+    "step_2900": {
+      "accuracy": 0.5167,
+      "mean_logit_difference": 0.0371
+    },
+    "step_3400": {
+      "accuracy": 0.6767,
+      "mean_logit_difference": 0.7199
+    },
+    "step_3800": {
+      "accuracy": 0.7333,
+      "mean_logit_difference": 0.8285
+    }
+  }
+}

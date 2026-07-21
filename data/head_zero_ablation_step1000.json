@@ -1,0 +1,36 @@
+{
+  "model": "EleutherAI/pythia-160m-deduped",
+  "checkpoint": 1000,
+  "intervention": "zero one attention-head output at a time",
+  "metric": "change in mean IO-minus-S logit difference relative to the clean baseline",
+  "protocol": {
+    "template_selection": "ALL_TEMPLATES[:8]",
+    "template_order": "the first eight BABA-style template families",
+    "template_families": 8,
+    "prompts_per_template": 20,
+    "symmetric_name_role_swaps": true,
+    "seed": 42,
+    "n_examples": 160,
+    "n_layers": 12,
+    "n_heads_per_layer": 12,
+    "n_heads_tested": 144
+  },
+  "baseline": {
+    "accuracy": 0.425,
+    "mean_logit_difference": -0.2398
+  },
+  "extrema": {
+    "largest_positive_change": {
+      "head": "L2H6",
+      "delta_logit_difference": 0.0704
+    },
+    "largest_negative_change": {
+      "head": "L0H0",
+      "delta_logit_difference": -0.0626
+    },
+    "largest_absolute_change": {
+      "head": "L2H6",
+      "absolute_delta_logit_difference": 0.0704
+    }
+  }
+}
