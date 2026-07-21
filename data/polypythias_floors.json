@@ -1,0 +1,64 @@
+{
+  "protocol": {
+    "task": "indirect object identification",
+    "template_selection": "ALL_TEMPLATES[:15]",
+    "template_order": "the first fifteen BABA-style template families",
+    "template_families": 15,
+    "prompts_per_template": 20,
+    "n_examples_per_checkpoint": 300,
+    "symmetric_name_role_swaps": true,
+    "seed": 42,
+    "checkpoints": [
+      0,
+      512,
+      1000,
+      2000,
+      3000,
+      5000,
+      8000,
+      10000,
+      33000,
+      143000
+    ],
+    "floor_definition": "minimum IO-versus-S forced-choice accuracy over the evaluated checkpoints",
+    "note": "These behavioral-sweep minima are separate from the accuracies measured in the matched-S2 intervention runs."
+  },
+  "models": {
+    "EleutherAI/pythia-160m-seed1": {
+      "floor_step": 2000,
+      "floor_accuracy": 0.3233
+    },
+    "EleutherAI/pythia-160m-seed3": {
+      "floor_step": 2000,
+      "floor_accuracy": 0.18
+    },
+    "EleutherAI/pythia-160m-seed5": {
+      "floor_step": 2000,
+      "floor_accuracy": 0.3433
+    },
+    "EleutherAI/pythia-160m-data-seed1": {
+      "floor_step": 2000,
+      "floor_accuracy": 0.2933
+    },
+    "EleutherAI/pythia-160m-data-seed2": {
+      "floor_step": 2000,
+      "floor_accuracy": 0.28
+    },
+    "EleutherAI/pythia-160m-data-seed3": {
+      "floor_step": 2000,
+      "floor_accuracy": 0.3533
+    },
+    "EleutherAI/pythia-160m-weight-seed1": {
+      "floor_step": 2000,
+      "floor_accuracy": 0.3333
+    },
+    "EleutherAI/pythia-160m-weight-seed2": {
+      "floor_step": 2000,
+      "floor_accuracy": 0.3667
+    },
+    "EleutherAI/pythia-160m-weight-seed3": {
+      "floor_step": 2000,
+      "floor_accuracy": 0.31
+    }
+  }
+}
