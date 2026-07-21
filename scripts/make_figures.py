@@ -189,7 +189,7 @@ def figure3(out_dir: Path) -> None:
     fig, axes = plt.subplots(2, 1, figsize=(3.4, 3.4), sharex=True)
     axes[0].plot(loss_step, loss_value, marker="o", linewidth=1.3, markersize=3)
     axes[0].set(
-        ylabel="Pile eval-sample loss",
+        ylabel="Pile sample loss",
         title="Loss decreases across sampled checkpoints",
     )
     axes[1].plot(
